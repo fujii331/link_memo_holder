@@ -1,0 +1,34 @@
+name: link_memo_holder
+description: link and memo save app.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_hooks: ^0.18.3
+  awesome_dialog: ^2.2.0
+  shared_preferences: ^2.0.13
+  url_launcher: ^6.1.0
+  bottom_navy_bar: ^6.0.0
+  receive_sharing_intent: ^1.4.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.0
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: NotoSerifJP
+      fonts:
+        - asset: assets/fonts/NotoSerifJP-Regular.otf
