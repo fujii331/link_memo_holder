@@ -3,10 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void addSharedContent(
   String content,
-  ValueNotifier<List<String>> memoContentListState,
-  ValueNotifier<List<String>> linkContentListState,
-  ValueNotifier<List<String>> memoKindListState,
-  ValueNotifier<List<String>> linkKindListState,
+  ValueNotifier<List<String>> memoContentsState,
+  ValueNotifier<List<String>> linkContentsState,
+  ValueNotifier<List<String>> memoKindsState,
+  ValueNotifier<List<String>> linkKindsState,
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // 正規表現
@@ -15,18 +15,18 @@ void addSharedContent(
 
   if (regExp.hasMatch(content)) {
     // urlが渡ってきた場合
-    linkContentListState.value.add(content);
-    linkKindListState.value.add('0');
-    prefs.setStringList('linkContentList', linkContentListState.value);
-    prefs.setStringList('linkKindList', linkKindListState.value);
+    linkContentsState.value.add(content);
+    linkKindsState.value.add('');
+    prefs.setStringList('linkContents', linkContentsState.value);
+    prefs.setStringList('linkKinds', linkKindsState.value);
 
     print("linkに追加: $content");
   } else {
     // url以外の場合
-    memoContentListState.value.add(content);
-    memoKindListState.value.add('0');
-    prefs.setStringList('memoContentList', memoContentListState.value);
-    prefs.setStringList('memoKindList', memoKindListState.value);
+    memoContentsState.value.add(content);
+    memoKindsState.value.add('');
+    prefs.setStringList('memoContents', memoContentsState.value);
+    prefs.setStringList('memoKinds', memoKindsState.value);
 
     print("memoに追加: $content");
   }

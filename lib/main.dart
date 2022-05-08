@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:link_memo_holder/screens/main_tab.screen.dart';
 import 'package:link_memo_holder/services/add_shared_content.service.dart';
@@ -14,55 +15,55 @@ void main() async {
 }
 
 useWidgetLifecycleObserver(
-  ValueNotifier<List<String>> memoContentListState,
-  ValueNotifier<List<String>> linkContentListState,
-  ValueNotifier<List<String>> memoKindListState,
-  ValueNotifier<List<String>> linkKindListState,
+  ValueNotifier<List<String>> memoContentsState,
+  ValueNotifier<List<String>> linkContentsState,
+  ValueNotifier<List<String>> memoKindsState,
+  ValueNotifier<List<String>> linkKindsState,
 ) {
   return use(_WidgetObserver(
-    memoContentListState,
-    linkContentListState,
-    memoKindListState,
-    linkKindListState,
+    memoContentsState,
+    linkContentsState,
+    memoKindsState,
+    linkKindsState,
   ));
 }
 
 class _WidgetObserver extends Hook<void> {
-  final ValueNotifier<List<String>> memoContentListState;
-  final ValueNotifier<List<String>> linkContentListState;
-  final ValueNotifier<List<String>> memoKindListState;
-  final ValueNotifier<List<String>> linkKindListState;
+  final ValueNotifier<List<String>> memoContentsState;
+  final ValueNotifier<List<String>> linkContentsState;
+  final ValueNotifier<List<String>> memoKindsState;
+  final ValueNotifier<List<String>> linkKindsState;
 
   const _WidgetObserver(
-    this.memoContentListState,
-    this.linkContentListState,
-    this.memoKindListState,
-    this.linkKindListState,
+    this.memoContentsState,
+    this.linkContentsState,
+    this.memoKindsState,
+    this.linkKindsState,
   );
 
   @override
   HookState<void, Hook<void>> createState() {
     return _WidgetObserverState(
-      memoContentListState,
-      linkContentListState,
-      memoKindListState,
-      linkKindListState,
+      memoContentsState,
+      linkContentsState,
+      memoKindsState,
+      linkKindsState,
     );
   }
 }
 
 class _WidgetObserverState extends HookState<void, _WidgetObserver>
     with WidgetsBindingObserver {
-  final ValueNotifier<List<String>> memoContentListState;
-  final ValueNotifier<List<String>> linkContentListState;
-  final ValueNotifier<List<String>> memoKindListState;
-  final ValueNotifier<List<String>> linkKindListState;
+  final ValueNotifier<List<String>> memoContentsState;
+  final ValueNotifier<List<String>> linkContentsState;
+  final ValueNotifier<List<String>> memoKindsState;
+  final ValueNotifier<List<String>> linkKindsState;
 
   _WidgetObserverState(
-    this.memoContentListState,
-    this.linkContentListState,
-    this.memoKindListState,
-    this.linkKindListState,
+    this.memoContentsState,
+    this.linkContentsState,
+    this.memoKindsState,
+    this.linkKindsState,
   );
 
   late StreamSubscription _intentDataStreamSubscription;
@@ -79,10 +80,10 @@ class _WidgetObserverState extends HookState<void, _WidgetObserver>
         ReceiveSharingIntent.getTextStream().listen((String value) async {
       addSharedContent(
         value,
-        memoContentListState,
-        linkContentListState,
-        memoKindListState,
-        linkKindListState,
+        memoContentsState,
+        linkContentsState,
+        memoKindsState,
+        linkKindsState,
       );
     }, onError: (err) {
       print("共有に失敗しました error: $err");
@@ -93,10 +94,10 @@ class _WidgetObserverState extends HookState<void, _WidgetObserver>
       if (value != null) {
         addSharedContent(
           value,
-          memoContentListState,
-          linkContentListState,
-          memoKindListState,
-          linkKindListState,
+          memoContentsState,
+          linkContentsState,
+          memoKindsState,
+          linkKindsState,
         );
       }
     });
@@ -117,29 +118,31 @@ class MyApp extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final memoContentListState = useState<List<String>>([]);
-    final linkContentListState = useState<List<String>>([]);
-    final memoKindListState = useState<List<String>>([]);
-    final linkKindListState = useState<List<String>>([]);
+    final memoContentsState = useState<List<String>>([]);
+    final linkContentsState = useState<List<String>>([]);
+    final memoKindsState = useState<List<String>>([]);
+    final linkKindsState = useState<List<String>>([]);
 
     useWidgetLifecycleObserver(
-      memoContentListState,
-      linkContentListState,
-      memoKindListState,
-      linkKindListState,
+      memoContentsState,
+      linkContentsState,
+      memoKindsState,
+      linkKindsState,
     );
 
     return MaterialApp(
-      title: 'Link & Memo Folder',
+      debugShowCheckedModeBanner: false,
+      builder: EasyLoading.init(),
+      title: 'Link・Memo Holder',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'NotoSerifJP',
+        fontFamily: 'NotoSansJP',
       ),
       home: MainTabScreen(
-        memoContentListState: memoContentListState,
-        linkContentListState: linkContentListState,
-        memoKindListState: memoKindListState,
-        linkKindListState: linkKindListState,
+        memoContentsState: memoContentsState,
+        linkContentsState: linkContentsState,
+        memoKindsState: memoKindsState,
+        linkKindsState: linkKindsState,
       ),
     );
   }
