@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InitialKindSet extends HookWidget {
   final ValueNotifier<String> selectKindState;
@@ -13,13 +14,10 @@ class InitialKindSet extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
-    final selectableKindsExist = selectableKinds.isNotEmpty;
-
     return Row(
       children: [
         Text(
-          isJapanese ? '分類' : 'Kind',
+          AppLocalizations.of(context).kind,
           style: TextStyle(
             color: Colors.blueGrey.shade600,
             fontSize: 14,
@@ -32,7 +30,7 @@ class InitialKindSet extends HookWidget {
           child: DropdownButton(
             isExpanded: true,
             hint: Text(
-              isJapanese ? '分類なし' : 'No kind',
+              AppLocalizations.of(context).no_kind,
               style: const TextStyle(
                 color: Colors.black38,
               ),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/services/update_kinds.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,9 +30,46 @@ class EditKindModal extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final canDoAction = useState(true);
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
 
     List<Widget> editRows = [];
+
+    final canAdd = selectableKindsState.value.length <= 10;
+
+    // 分類が9個以下の場合、登録用の列を追加
+    editRows.add(
+      SizedBox(
+        width: 190,
+        child: Text(
+          AppLocalizations.of(context).add,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            color: canAdd ? Colors.orange.shade500 : Colors.grey,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+    editRows.add(_addRow(
+      canDoAction,
+      context,
+      selectableKindsState.value.length <= 10,
+    ));
+
+    if (selectableKindsState.value.isNotEmpty) {
+      editRows.add(
+        SizedBox(
+          width: 190,
+          child: Text(
+            AppLocalizations.of(context).edit_delete,
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              color: Colors.green.shade400,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      );
+    }
 
     for (String selectableKind in selectableKindsState.value) {
       // 分類を追加
@@ -38,17 +77,9 @@ class EditKindModal extends HookWidget {
         _editRow(
           selectableKind,
           canDoAction,
-          isJapanese,
+          context,
         ),
       );
-    }
-
-    // 分類が15個以下の場合、登録用の列を追加
-    if (selectableKindsState.value.length <= 15) {
-      editRows.add(_addRow(
-        canDoAction,
-        isJapanese,
-      ));
     }
 
     return Padding(
@@ -63,10 +94,8 @@ class EditKindModal extends HookWidget {
         children: [
           Text(
             isLinkTab
-                ? (isJapanese ? 'リンク分類' : "Link kinds")
-                : isJapanese
-                    ? 'メモ分類'
-                    : "Memo kinds",
+                ? AppLocalizations.of(context).link_kinds
+                : AppLocalizations.of(context).memo_kinds,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
@@ -85,7 +114,7 @@ class EditKindModal extends HookWidget {
   Widget _editRow(
     String targetKind,
     ValueNotifier<bool> canDoAction,
-    bool isJapanese,
+    BuildContext context,
   ) {
     final textState = useState(targetKind);
     final validateOkState =
@@ -100,7 +129,7 @@ class EditKindModal extends HookWidget {
           height: 35,
           child: TextFormField(
             decoration: InputDecoration(
-              hintText: isJapanese ? '更新で削除' : 'You can delete.',
+              hintText: AppLocalizations.of(context).tap_to_enter,
             ),
             style: const TextStyle(
               fontSize: 14,
@@ -137,6 +166,26 @@ class EditKindModal extends HookWidget {
                       await SharedPreferences.getInstance();
 
                   if (isDeleteState.value) {
+                    Navigator.pop(screenContext);
+
+                    AwesomeDialog(
+                      context: screenContext,
+                      dialogType: DialogType.NO_HEADER,
+                      headerAnimationLoop: false,
+                      showCloseIcon: true,
+                      animType: AnimType.SCALE,
+                      width: MediaQuery.of(screenContext).size.width * .86 > 550
+                          ? 550
+                          : null,
+                      body: EditKindModal(
+                        screenContext: screenContext,
+                        selectableKindsState: selectableKindsState,
+                        selectKindState: selectKindState,
+                        kindsState: kindsState,
+                        updateCatchState: updateCatchState,
+                        isLinkTab: isLinkTab,
+                      ),
+                    ).show();
                     // 削除処理の場合
                     selectableKindsState.value.remove(targetKind);
 
@@ -162,27 +211,6 @@ class EditKindModal extends HookWidget {
                       selectableKindsState,
                       kindsState,
                     );
-
-                    Navigator.pop(screenContext);
-
-                    AwesomeDialog(
-                      context: screenContext,
-                      dialogType: DialogType.NO_HEADER,
-                      headerAnimationLoop: false,
-                      showCloseIcon: true,
-                      animType: AnimType.SCALE,
-                      width: MediaQuery.of(screenContext).size.width * .86 > 550
-                          ? 550
-                          : null,
-                      body: EditKindModal(
-                        screenContext: screenContext,
-                        selectableKindsState: selectableKindsState,
-                        selectKindState: selectKindState,
-                        kindsState: kindsState,
-                        updateCatchState: updateCatchState,
-                        isLinkTab: isLinkTab,
-                      ),
-                    ).show();
                   } else {
                     // 更新処理の場合
                     // 他の分類と同じ値がないか判定用
@@ -229,9 +257,7 @@ class EditKindModal extends HookWidget {
                       }
                     } else {
                       EasyLoading.showToast(
-                        isJapanese
-                            ? '同じ名前の分類は登録できません'
-                            : "You can't enter the same kind.",
+                        AppLocalizations.of(context).cannot_enter_same_kind,
                         duration: const Duration(milliseconds: 2500),
                         toastPosition: EasyLoadingToastPosition.center,
                         dismissOnTap: true,
@@ -239,10 +265,11 @@ class EditKindModal extends HookWidget {
                     }
                   }
                   updateCatchState.value = UpdateCatch(
-                    targetNumber: 0,
+                    targetNumber: null,
                     isDelete: !updateCatchState.value.isDelete,
                     kind: null,
                     url: null,
+                    isRegeneration: true,
                   );
                   validateOkState.value = false;
                   canDoAction.value = true;
@@ -255,97 +282,105 @@ class EditKindModal extends HookWidget {
 
   Widget _addRow(
     ValueNotifier<bool> canDoAction,
-    bool isJapanese,
+    BuildContext context,
+    bool canAdd,
   ) {
-    final textState = useState('');
+    final textController = useTextEditingController(text: '');
     final validateOkState =
-        useState(canDoAction.value && textState.value != '');
+        useState(canDoAction.value && textController.text != '');
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 120,
-          height: 35,
-          child: TextFormField(
-            decoration: InputDecoration(
-              hintText: isJapanese ? 'タップして入力' : 'Tap to enter.',
-            ),
-            style: const TextStyle(
-              fontSize: 14,
-            ),
-            onChanged: (target) {
-              textState.value = target;
-              validateOkState.value = target.isNotEmpty;
-            },
-            inputFormatters: <TextInputFormatter>[
-              LengthLimitingTextInputFormatter(
-                10,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 120,
+            height: 35,
+            child: TextFormField(
+              decoration: InputDecoration(
+                hintText: canAdd
+                    ? AppLocalizations.of(context).tap_to_enter
+                    : AppLocalizations.of(context).cannot_add,
               ),
-            ],
+              style: const TextStyle(
+                fontSize: 14,
+              ),
+              enabled: canAdd,
+              controller: textController,
+              onChanged: (target) {
+                validateOkState.value = target.isNotEmpty;
+              },
+              inputFormatters: <TextInputFormatter>[
+                LengthLimitingTextInputFormatter(
+                  10,
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 15),
-        // 登録ボタン
-        IconButton(
-          icon: Icon(
-            Icons.add,
-            color: validateOkState.value ? Colors.green : Colors.grey,
-          ),
-          onPressed: validateOkState.value
-              ? () async {
-                  // 処理が終わるまで更新できないようにする
-                  canDoAction.value = false;
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+          const SizedBox(width: 15),
+          // 登録ボタン
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: validateOkState.value ? Colors.green : Colors.grey,
+            ),
+            onPressed: validateOkState.value
+                ? () async {
+                    // 処理が終わるまで更新できないようにする
+                    canDoAction.value = false;
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
 
-                  // 他の分類と同じ値がないか判定用
-                  bool existSameKind = false;
+                    // 他の分類と同じ値がないか判定用
+                    bool existSameKind = false;
 
-                  // 同じ値の分類がないか判定
-                  for (String selectableKind in selectableKindsState.value) {
-                    if (selectableKind == textState.value) {
-                      existSameKind = true;
-                      break;
+                    // 同じ値の分類がないか判定
+                    for (String selectableKind in selectableKindsState.value) {
+                      if (selectableKind == textController.text) {
+                        existSameKind = true;
+                        break;
+                      }
                     }
-                  }
 
-                  // 同じ分類が存在しなかった場合
-                  if (!existSameKind) {
-                    // 分類を追加
-                    selectableKindsState.value.add(textState.value);
+                    // 同じ分類が存在しなかった場合
+                    if (!existSameKind) {
+                      // 分類を追加
+                      selectableKindsState.value.add(textController.text);
 
-                    if (isLinkTab) {
-                      prefs.setStringList(
-                          'selectableLinkKinds', selectableKindsState.value);
+                      if (isLinkTab) {
+                        prefs.setStringList(
+                            'selectableLinkKinds', selectableKindsState.value);
+                      } else {
+                        prefs.setStringList(
+                            'selectableMemoKinds', selectableKindsState.value);
+                      }
+
+                      textController.text = '';
                     } else {
-                      prefs.setStringList(
-                          'selectableMemoKinds', selectableKindsState.value);
+                      EasyLoading.showToast(
+                        AppLocalizations.of(context).cannot_enter_same_kind,
+                        duration: const Duration(milliseconds: 2500),
+                        toastPosition: EasyLoadingToastPosition.center,
+                        dismissOnTap: true,
+                      );
                     }
-                  } else {
-                    EasyLoading.showToast(
-                      isJapanese
-                          ? '同じ名前の分類は登録できません'
-                          : "You can't enter the same kind.",
-                      duration: const Duration(milliseconds: 2500),
-                      toastPosition: EasyLoadingToastPosition.center,
-                      dismissOnTap: true,
+
+                    updateCatchState.value = UpdateCatch(
+                      targetNumber: null,
+                      isDelete: !updateCatchState.value.isDelete,
+                      kind: null,
+                      url: null,
+                      isRegeneration: true,
                     );
+
+                    validateOkState.value = false;
+                    canDoAction.value = true;
                   }
-
-                  updateCatchState.value = UpdateCatch(
-                    targetNumber: 0,
-                    isDelete: !updateCatchState.value.isDelete,
-                    kind: null,
-                    url: null,
-                  );
-
-                  validateOkState.value = false;
-                  canDoAction.value = true;
-                }
-              : () {},
-        ),
-      ],
+                : () {},
+          ),
+        ],
+      ),
     );
   }
 }

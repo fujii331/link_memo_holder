@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/widgets/common/set_kind.widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,13 +27,12 @@ class ActionRow extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
     final linkKind = kindsState.value[targetNumber];
 
     return Row(
       children: [
         Text(
-          linkKind != '' ? linkKind : (isJapanese ? '分類なし' : "No kind"),
+          linkKind != '' ? linkKind : AppLocalizations.of(context).no_kind,
           style: TextStyle(
             fontSize: 13,
             color: Colors.grey.shade700,
@@ -49,7 +50,7 @@ class ActionRow extends HookWidget {
         GestureDetector(
           onTap: () async {
             EasyLoading.showToast(
-              isJapanese ? 'ボタン長押しで削除' : "Press and hold the button to delete.",
+              AppLocalizations.of(context).delete_data,
               duration: const Duration(milliseconds: 2500),
               toastPosition: EasyLoadingToastPosition.center,
               dismissOnTap: true,
@@ -67,7 +68,7 @@ class ActionRow extends HookWidget {
                 isLinkTab ? 'linkKinds' : 'memoKinds', kindsState.value);
 
             EasyLoading.showToast(
-              isJapanese ? '削除しました' : "Deleted it.",
+              AppLocalizations.of(context).delete_finished,
               duration: const Duration(milliseconds: 3000),
               toastPosition: EasyLoadingToastPosition.center,
               dismissOnTap: true,
@@ -78,12 +79,13 @@ class ActionRow extends HookWidget {
               isDelete: true,
               kind: null,
               url: null,
+              isRegeneration: false,
             );
           },
           child: Icon(
             Icons.delete,
             color: Colors.red.shade400,
-            size: 20,
+            size: 22,
           ),
         ),
         const SizedBox(width: 15),

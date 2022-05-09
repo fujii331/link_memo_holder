@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/widgets/common/initial_kind_set.widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +32,6 @@ class LinkAdd extends HookWidget {
     final textController = useTextEditingController();
     final selectKindState = useState<String>('');
 
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
     final canUpdateState = useState<bool>(true);
 
     return SingleChildScrollView(
@@ -54,7 +55,7 @@ class LinkAdd extends HookWidget {
             SizedBox(
               child: TextFormField(
                 decoration: InputDecoration(
-                  hintText: isJapanese ? 'タップして入力' : 'Tap to enter',
+                  hintText: AppLocalizations.of(context).tap_to_enter,
                   hintStyle: const TextStyle(
                     color: Colors.black38,
                   ),
@@ -96,9 +97,7 @@ class LinkAdd extends HookWidget {
                           // URL判定
                           if (!regExp.hasMatch(textController.text)) {
                             EasyLoading.showToast(
-                              isJapanese
-                                  ? 'URLの形式が不正です'
-                                  : "URL format is invalid.",
+                              AppLocalizations.of(context).invalid_url_format,
                               duration: const Duration(milliseconds: 2500),
                               toastPosition: EasyLoadingToastPosition.center,
                               dismissOnTap: true,
@@ -108,10 +107,8 @@ class LinkAdd extends HookWidget {
                                 await SharedPreferences.getInstance();
 
                             // リンクを更新
-                            linkContentsState.value
-                                .insert(0, textController.text);
-                            linkKindsState.value
-                                .insert(0, selectKindState.value);
+                            linkContentsState.value.add(textController.text);
+                            linkKindsState.value.add(selectKindState.value);
 
                             prefs.setStringList(
                                 'linkContents', linkContentsState.value);
@@ -119,10 +116,11 @@ class LinkAdd extends HookWidget {
                                 'linkKinds', linkKindsState.value);
 
                             updateLinkCatchState.value = UpdateCatch(
-                              targetNumber: 0,
+                              targetNumber: null,
                               isDelete: false,
                               kind: selectKindState.value,
                               url: textController.text,
+                              isRegeneration: false,
                             );
 
                             Navigator.pop(context);

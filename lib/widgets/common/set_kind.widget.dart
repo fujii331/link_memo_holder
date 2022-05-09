@@ -44,7 +44,7 @@ class SetKind extends HookWidget {
           Icons.edit,
           color: enabledSet ? Colors.green.shade400 : Colors.grey,
         ),
-        iconSize: 20,
+        iconSize: 22,
         enabled: enabledSet,
         onSelected: (String result) async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,6 +58,7 @@ class SetKind extends HookWidget {
             isDelete: false,
             kind: result,
             url: null,
+            isRegeneration: false,
           );
         },
         itemBuilder: (BuildContext context) => kindMenus,

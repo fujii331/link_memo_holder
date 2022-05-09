@@ -1,0 +1,25 @@
+{
+  "@@locale": "en",
+
+  "edit_mode": "Edit mode",
+  "no_link": "You can register the link by pressing the + button or sharing from another app.",
+  "no_memo": "You can register the memo by pressing the + button or sharing from another app.",
+  "no_kind": "No kind",
+  "memo": "Memo",
+  "delete_data": "Press and hold the button to delete.",
+  "delete_finished": "Deleted it.",
+  "link_kinds": "Link kinds",
+  "memo_kinds": "Memo kinds",
+  "add": "Add",
+  "edit_delete": "Edit・Delete",
+  "can_delete": "You can delete.",
+  "cannot_add": "Can't add any more.",
+  "cannot_enter_same_kind": "You can't enter the same kind.",
+  "tap_to_enter": "Tap to enter.",
+  "to_use_kinds": "Register kinds to use it.",
+  "kind": "Kind",
+  "invalid_url_format": "URL format is invalid.",
+  "invalid_url": "Url is invalid.",
+  "no_title": "No title",
+  "no_description": "No description"
+}

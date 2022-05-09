@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/widgets/common/initial_kind_set.widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MemoAdd extends HookWidget {
   final ValueNotifier<List<String>> memoContentsState;
@@ -29,7 +30,6 @@ class MemoAdd extends HookWidget {
     final textController = useTextEditingController();
     final selectKindState = useState<String>('');
 
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
     final canUpdateState = useState<bool>(true);
 
     return SingleChildScrollView(
@@ -45,7 +45,7 @@ class MemoAdd extends HookWidget {
           children: <Widget>[
             SizedBox(
               child: Text(
-                'Memo',
+                AppLocalizations.of(context).memo,
                 style: TextStyle(
                   color: Colors.blueGrey.shade600,
                   fontSize: 14,
@@ -54,7 +54,7 @@ class MemoAdd extends HookWidget {
             ),
             const SizedBox(height: 10),
             Container(
-              height: 170,
+              height: 250,
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Colors.grey.shade500,
@@ -70,7 +70,7 @@ class MemoAdd extends HookWidget {
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
                   decoration: InputDecoration(
-                    hintText: isJapanese ? 'タップして入力' : 'Tap to enter.',
+                    hintText: AppLocalizations.of(context).tap_to_enter,
                     enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(
                         color: Colors.white,
@@ -124,10 +124,11 @@ class MemoAdd extends HookWidget {
                               memoKindsState.value.add(selectKindState.value);
 
                               updateMemoCatchState.value = UpdateCatch(
-                                targetNumber: 0,
+                                targetNumber: null,
                                 isDelete: !updateMemoCatchState.value.isDelete,
                                 kind: null,
                                 url: null,
+                                isRegeneration: false,
                               );
 
                               prefs.setStringList(

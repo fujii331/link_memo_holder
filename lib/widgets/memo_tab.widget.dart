@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/screens/memo_detail.screen.dart';
 import 'package:link_memo_holder/widgets/common/action_row.widget.dart';
@@ -22,8 +24,10 @@ class MemoTab extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
     final memoCardsState = useState<List<Widget>>([]);
+    final double paddingWidth = MediaQuery.of(context).size.width > 550.0
+        ? (MediaQuery.of(context).size.width - 550) / 2
+        : 5;
 
     useEffect(() {
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
@@ -34,9 +38,9 @@ class MemoTab extends HookWidget {
               memoContentsState.value[i],
               memoKindsState.value[i],
               i,
-              isJapanese,
               context,
               updateMemoCatchState,
+              paddingWidth,
             ),
           );
         }
@@ -60,16 +64,23 @@ class MemoTab extends HookWidget {
         padding: const EdgeInsets.only(
           right: 10,
           left: 10,
-          top: 4,
-          bottom: 10,
+          top: 8,
+          bottom: 5,
         ),
-        child: memoCardsState.value.isNotEmpty
+        child: memoCardsState.value.isNotEmpty &&
+                (selectMemoKind == null ||
+                    memoKindsState.value
+                        .where((element) => element == selectMemoKind)
+                        .toList()
+                        .isNotEmpty)
             ? ListView.builder(
                 itemBuilder: (context, index) {
+                  final displayIndex = memoCardsState.value.length - index - 1;
+
                   // 分類が設定されていないか、対象の分類だった場合は表示対象に
                   if (selectMemoKind == null ||
-                      memoKindsState.value[index] == selectMemoKind) {
-                    return memoCardsState.value[index];
+                      memoKindsState.value[displayIndex] == selectMemoKind) {
+                    return memoCardsState.value[displayIndex];
                   } else {
                     return Container();
                   }
@@ -77,9 +88,10 @@ class MemoTab extends HookWidget {
                 itemCount: memoCardsState.value.length,
               )
             : Text(
-                isJapanese ? 'リンクは未登録です' : "No links are registered.",
-                style: const TextStyle(
-                  fontSize: 18,
+                AppLocalizations.of(context).no_memo,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 16,
                 ),
               ),
       ),
@@ -90,12 +102,16 @@ class MemoTab extends HookWidget {
     String memo,
     String memoKind,
     int targetNumber,
-    bool isJapanese,
     BuildContext context,
     ValueNotifier<UpdateCatch> updateMemoCatchState,
+    double paddingWidth,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
+      padding: EdgeInsets.only(
+        bottom: 15,
+        left: paddingWidth,
+        right: paddingWidth,
+      ),
       child: GestureDetector(
         onTap: () {
           Navigator.push(

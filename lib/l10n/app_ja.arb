@@ -1,0 +1,25 @@
+{
+  "@@locale": "ja",
+
+  "edit_mode": "編集モード",
+  "no_link": "+ボタンか他のアプリからの共有でリンクを登録できます。",
+  "no_memo": "+ボタンか他のアプリからの共有でメモを登録できます。",
+  "no_kind": "分類なし",
+  "memo": "メモ",
+  "delete_data": "ボタン長押しで削除",
+  "delete_finished": "削除しました",
+  "link_kinds": "リンク分類",
+  "memo_kinds": "メモ分類",
+  "add": "追加",
+  "edit_delete": "編集・削除",
+  "can_delete": "削除できます",
+  "cannot_add": "上限登録数です",
+  "cannot_enter_same_kind": "同じ名前の分類は登録できません",
+  "tap_to_enter": "タップして入力",
+  "to_use_kinds": "分類を登録後に使用できます",
+  "kind": "分類",
+  "invalid_url_format": "URLの形式が不正です",
+  "invalid_url": "無効なURLです",
+  "no_title": "タイトルなし",
+  "no_description": "説明文なし"
+}

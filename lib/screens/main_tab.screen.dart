@@ -2,8 +2,10 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:link_memo_holder/models/link_card_item.model.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/services/fetch_ogp.service.dart';
+import 'package:link_memo_holder/widgets/common/action_row.widget.dart';
 import 'package:link_memo_holder/widgets/common/edit_kind_modal.widget.dart';
 import 'package:link_memo_holder/widgets/common/filter_kind.widget.dart';
 import 'package:link_memo_holder/widgets/link_tab.widget.dart';
@@ -19,6 +21,8 @@ class MainTabScreen extends HookWidget {
   final ValueNotifier<List<String>> linkContentsState;
   final ValueNotifier<List<String>> memoKindsState;
   final ValueNotifier<List<String>> linkKindsState;
+  final ValueNotifier<UpdateCatch> updateLinkCatchState;
+  final ValueNotifier<UpdateCatch> updateMemoCatchState;
 
   const MainTabScreen({
     Key? key,
@@ -26,11 +30,12 @@ class MainTabScreen extends HookWidget {
     required this.linkContentsState,
     required this.memoKindsState,
     required this.linkKindsState,
+    required this.updateLinkCatchState,
+    required this.updateMemoCatchState,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
     final screenNo = useState<int>(0);
     final pageController = usePageController(initialPage: 0, keepPage: true);
     final selectLinkKindState = useState<String?>(null);
@@ -41,25 +46,7 @@ class MainTabScreen extends HookWidget {
     final selectableMemoKindsState = useState<List<String>>([]);
 
     final loadingState = useState<bool>(true);
-    final linkCardsState = useState<List<Widget>>([]);
-
-    final updateLinkCatchState = useState<UpdateCatch>(
-      const UpdateCatch(
-        targetNumber: 0,
-        isDelete: false,
-        kind: null,
-        url: null,
-      ),
-    );
-
-    final updateMemoCatchState = useState<UpdateCatch>(
-      const UpdateCatch(
-        targetNumber: 0,
-        isDelete: false,
-        kind: null,
-        url: null,
-      ),
-    );
+    final linkCardItemsState = useState<List<LinkCardItem>>([]);
 
     useEffect(() {
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
@@ -73,36 +60,43 @@ class MainTabScreen extends HookWidget {
             prefs.getStringList('selectableMemoKinds') ?? [];
 
         linkContentsState.value = prefs.getStringList('linkContents') ?? [];
+        // linkContentsState.value = [];
 
         memoContentsState.value = prefs.getStringList('memoContents') ?? [];
 
         linkKindsState.value = prefs.getStringList('linkKinds') ?? [];
+        // linkKindsState.value = [];
 
         memoKindsState.value = prefs.getStringList('memoKinds') ?? [];
 
         loadingState.value = true;
-        List<Widget> linkCards = [];
+        List<LinkCardItem> linkCardItems = [];
 
         for (var i = 0; i < linkContentsState.value.length; i++) {
           final uri = Uri.parse(linkContentsState.value[i]);
 
           Metadata? metadata = await fetchOgp(uri);
-          // 分類を追加
-          linkCards.add(
-            LinkCard(
+          linkCardItems.add(
+            LinkCardItem(
+              linkCard: LinkCard(
+                uri: uri,
+                metadata: metadata,
+                actionRow: ActionRow(
+                  selectableKinds: selectableLinkKindsState.value,
+                  contentsState: linkContentsState,
+                  kindsState: linkKindsState,
+                  targetNumber: i,
+                  updateCatchState: updateLinkCatchState,
+                  isLinkTab: true,
+                ),
+              ),
               uri: uri,
               metadata: metadata,
-              targetNumber: i,
-              isJapanese: isJapanese,
-              selectableKinds: selectableLinkKindsState.value,
-              linkContentsState: linkContentsState,
-              linkKindsState: linkKindsState,
-              updateLinkCatchState: updateLinkCatchState,
             ),
           );
         }
 
-        linkCardsState.value = linkCards;
+        linkCardItemsState.value = linkCardItems;
         loadingState.value = false;
       });
       return null;
@@ -121,8 +115,8 @@ class MainTabScreen extends HookWidget {
         ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
+            bottomLeft: Radius.circular(5),
+            bottomRight: Radius.circular(5),
           ),
         ),
         elevation: 0,
@@ -254,32 +248,29 @@ class MainTabScreen extends HookWidget {
           );
         },
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: PageView(
-          controller: pageController,
-          onPageChanged: (index) {
-            screenNo.value = index;
-          },
-          children: [
-            LinkTab(
-              linkCardsState: linkCardsState,
-              linkContentsState: linkContentsState,
-              linkKindsState: linkKindsState,
-              selectableLinkKinds: selectableLinkKindsState.value,
-              loadingState: loadingState,
-              updateLinkCatchState: updateLinkCatchState,
-              selectLinkKindState: selectLinkKindState,
-            ),
-            MemoTab(
-              selectableMemoKindsState: selectableMemoKindsState,
-              memoContentsState: memoContentsState,
-              memoKindsState: memoKindsState,
-              updateMemoCatchState: updateMemoCatchState,
-              selectMemoKind: selectMemoKindState.value,
-            ),
-          ],
-        ),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          screenNo.value = index;
+        },
+        children: [
+          LinkTab(
+            linkCardItemsState: linkCardItemsState,
+            linkContentsState: linkContentsState,
+            linkKindsState: linkKindsState,
+            selectableLinkKinds: selectableLinkKindsState.value,
+            loadingState: loadingState,
+            updateLinkCatchState: updateLinkCatchState,
+            selectLinkKind: selectLinkKindState.value,
+          ),
+          MemoTab(
+            selectableMemoKindsState: selectableMemoKindsState,
+            memoContentsState: memoContentsState,
+            memoKindsState: memoKindsState,
+            updateMemoCatchState: updateMemoCatchState,
+            selectMemoKind: selectMemoKindState.value,
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,6 @@ class MemoDetailScreen extends HookWidget {
     final isEditingState = useState<bool>(false);
     final textController = useTextEditingController(text: targetMemo);
     final canUpdateState = useState<bool>(true);
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
 
     return Scaffold(
       backgroundColor: Colors.brown.shade50,
@@ -30,7 +30,7 @@ class MemoDetailScreen extends HookWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          isEditingState.value ? (isJapanese ? '編集モード' : 'Edit mode') : '',
+          isEditingState.value ? AppLocalizations.of(context).edit_mode : '',
         ),
         leading: TextButton(
           child: Icon(
@@ -46,8 +46,8 @@ class MemoDetailScreen extends HookWidget {
         ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
+            bottomLeft: Radius.circular(5),
+            bottomRight: Radius.circular(5),
           ),
         ),
         elevation: 0,
@@ -87,10 +87,11 @@ class MemoDetailScreen extends HookWidget {
                         isEditingState.value = !isEditingState.value;
 
                         updateMemoCatchState.value = UpdateCatch(
-                          targetNumber: 0,
+                          targetNumber: null,
                           isDelete: !updateMemoCatchState.value.isDelete,
                           kind: null,
                           url: null,
+                          isRegeneration: false,
                         );
                       }
                     : () {},

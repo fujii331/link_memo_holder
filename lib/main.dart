@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/screens/main_tab.screen.dart';
 import 'package:link_memo_holder/services/add_shared_content.service.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
@@ -19,12 +22,16 @@ useWidgetLifecycleObserver(
   ValueNotifier<List<String>> linkContentsState,
   ValueNotifier<List<String>> memoKindsState,
   ValueNotifier<List<String>> linkKindsState,
+  ValueNotifier<UpdateCatch> updateLinkCatchState,
+  ValueNotifier<UpdateCatch> updateMemoCatchState,
 ) {
   return use(_WidgetObserver(
     memoContentsState,
     linkContentsState,
     memoKindsState,
     linkKindsState,
+    updateLinkCatchState,
+    updateMemoCatchState,
   ));
 }
 
@@ -33,12 +40,16 @@ class _WidgetObserver extends Hook<void> {
   final ValueNotifier<List<String>> linkContentsState;
   final ValueNotifier<List<String>> memoKindsState;
   final ValueNotifier<List<String>> linkKindsState;
+  final ValueNotifier<UpdateCatch> updateLinkCatchState;
+  final ValueNotifier<UpdateCatch> updateMemoCatchState;
 
   const _WidgetObserver(
     this.memoContentsState,
     this.linkContentsState,
     this.memoKindsState,
     this.linkKindsState,
+    this.updateLinkCatchState,
+    this.updateMemoCatchState,
   );
 
   @override
@@ -48,6 +59,8 @@ class _WidgetObserver extends Hook<void> {
       linkContentsState,
       memoKindsState,
       linkKindsState,
+      updateLinkCatchState,
+      updateMemoCatchState,
     );
   }
 }
@@ -58,12 +71,16 @@ class _WidgetObserverState extends HookState<void, _WidgetObserver>
   final ValueNotifier<List<String>> linkContentsState;
   final ValueNotifier<List<String>> memoKindsState;
   final ValueNotifier<List<String>> linkKindsState;
+  final ValueNotifier<UpdateCatch> updateLinkCatchState;
+  final ValueNotifier<UpdateCatch> updateMemoCatchState;
 
   _WidgetObserverState(
     this.memoContentsState,
     this.linkContentsState,
     this.memoKindsState,
     this.linkKindsState,
+    this.updateLinkCatchState,
+    this.updateMemoCatchState,
   );
 
   late StreamSubscription _intentDataStreamSubscription;
@@ -84,6 +101,8 @@ class _WidgetObserverState extends HookState<void, _WidgetObserver>
         linkContentsState,
         memoKindsState,
         linkKindsState,
+        updateLinkCatchState,
+        updateMemoCatchState,
       );
     }, onError: (err) {
       print("共有に失敗しました error: $err");
@@ -98,6 +117,8 @@ class _WidgetObserverState extends HookState<void, _WidgetObserver>
           linkContentsState,
           memoKindsState,
           linkKindsState,
+          updateLinkCatchState,
+          updateMemoCatchState,
         );
       }
     });
@@ -122,15 +143,37 @@ class MyApp extends HookWidget {
     final linkContentsState = useState<List<String>>([]);
     final memoKindsState = useState<List<String>>([]);
     final linkKindsState = useState<List<String>>([]);
+    final updateLinkCatchState = useState<UpdateCatch>(
+      const UpdateCatch(
+        targetNumber: null,
+        isDelete: false,
+        kind: null,
+        url: null,
+        isRegeneration: false,
+      ),
+    );
+    final updateMemoCatchState = useState<UpdateCatch>(
+      const UpdateCatch(
+        targetNumber: null,
+        isDelete: false,
+        kind: null,
+        url: null,
+        isRegeneration: false,
+      ),
+    );
 
     useWidgetLifecycleObserver(
       memoContentsState,
       linkContentsState,
       memoKindsState,
       linkKindsState,
+      updateLinkCatchState,
+      updateMemoCatchState,
     );
 
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
       title: 'Link・Memo Holder',
@@ -143,6 +186,8 @@ class MyApp extends HookWidget {
         linkContentsState: linkContentsState,
         memoKindsState: memoKindsState,
         linkKindsState: linkKindsState,
+        updateLinkCatchState: updateLinkCatchState,
+        updateMemoCatchState: updateMemoCatchState,
       ),
     );
   }

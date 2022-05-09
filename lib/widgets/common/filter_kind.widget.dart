@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:link_memo_holder/parts/kind_menu_item.part.dart';
 
 class FilterKind extends HookWidget {
@@ -19,7 +21,6 @@ class FilterKind extends HookWidget {
   Widget build(BuildContext context) {
     final bool enabledFilter = selectableKinds.isNotEmpty;
     List<PopupMenuEntry<String>> kindMenus = [];
-    final isJapanese = Localizations.localeOf(context).toString() == 'ja';
 
     for (String selectableKind in selectableKinds) {
       // 分類を追加
@@ -36,9 +37,12 @@ class FilterKind extends HookWidget {
             icon: Icon(
               Icons.filter_alt,
               size: 26,
-              color: enabledFilter ? Colors.white : Colors.grey.shade400,
+              color: enabledFilter
+                  ? selectKindState.value != null
+                      ? Colors.green.shade200
+                      : Colors.white
+                  : Colors.grey.shade400,
             ),
-            enabled: enabledFilter,
             onSelected: (String result) {
               selectKindState.value =
                   result != selectKindState.value ? result : null;
@@ -53,7 +57,7 @@ class FilterKind extends HookWidget {
             ),
             onPressed: () {
               EasyLoading.showToast(
-                isJapanese ? '分類を登録後に使用できます' : "Register kinds to use it.",
+                AppLocalizations.of(context).to_use_kinds,
                 duration: const Duration(milliseconds: 2500),
                 toastPosition: EasyLoadingToastPosition.center,
                 dismissOnTap: true,
