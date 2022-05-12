@@ -53,3 +53,4 @@ app.*.map.json
 /lib/data
 ios/Runner/GoogleService-Info.plist
 android/app/src/main/ic_launcher-playstore.png
+/data

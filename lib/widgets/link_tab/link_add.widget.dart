@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:link_memo_holder/models/update_catch.model.dart';
+import 'package:link_memo_holder/parts/reg_exp.part.dart';
 import 'package:link_memo_holder/widgets/common/initial_kind_set.widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,14 +71,11 @@ class LinkAdd extends HookWidget {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  child: const Text('登録'),
+                  child: Text(AppLocalizations.of(context).add_data),
                   style: ElevatedButton.styleFrom(
                     primary: textController.text.isNotEmpty
                         ? Colors.orange.shade600
                         : Colors.orange.shade200,
-                    padding: EdgeInsets.only(
-                      bottom: Platform.isAndroid ? 3 : 1,
-                    ),
                     shape: const StadiumBorder(),
                     side: BorderSide(
                       width: 2,
@@ -90,17 +86,13 @@ class LinkAdd extends HookWidget {
                           textController.text.isNotEmpty
                       ? () async {
                           canUpdateState.value = false;
-                          // 正規表現
-                          RegExp regExp = RegExp(
-                              r'((https?:\/\/)|(https?:www\.)|(www\.))[a-zA-Z0-9-]{1,256}\.[a-zA-Z0-9]{2,6}(\/[a-zA-Z0-9亜-熙ぁ-んァ-ヶ()@:%_\+.~#?&\/=-]*)?');
-
                           // URL判定
                           if (!regExp.hasMatch(textController.text)) {
                             EasyLoading.showToast(
                               AppLocalizations.of(context).invalid_url_format,
                               duration: const Duration(milliseconds: 2500),
                               toastPosition: EasyLoadingToastPosition.center,
-                              dismissOnTap: true,
+                              dismissOnTap: false,
                             );
                           } else {
                             SharedPreferences prefs =
@@ -121,6 +113,13 @@ class LinkAdd extends HookWidget {
                               kind: selectKindState.value,
                               url: textController.text,
                               isRegeneration: false,
+                            );
+
+                            EasyLoading.showToast(
+                              AppLocalizations.of(context).added,
+                              duration: const Duration(milliseconds: 2500),
+                              toastPosition: EasyLoadingToastPosition.center,
+                              dismissOnTap: false,
                             );
 
                             Navigator.pop(context);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/screens/main_tab.screen.dart';
@@ -12,7 +13,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // MobileAds.instance.initialize();
+  MobileAds.instance.initialize();
 
   runApp(const MyApp());
 }
@@ -176,7 +177,7 @@ class MyApp extends HookWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
-      title: 'Link・Memo Holder',
+      title: 'La Clip',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'NotoSansJP',

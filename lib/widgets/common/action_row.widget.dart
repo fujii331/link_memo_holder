@@ -1,11 +1,13 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:link_memo_holder/widgets/common/delete_modal.widget.dart';
+import 'package:link_memo_holder/widgets/common/timer_set_modal.widget.dart';
 
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/widgets/common/set_kind.widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ActionRow extends HookWidget {
   final List<String> selectableKinds;
@@ -14,6 +16,7 @@ class ActionRow extends HookWidget {
   final int targetNumber;
   final ValueNotifier<UpdateCatch> updateCatchState;
   final bool isLinkTab;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   const ActionRow({
     Key? key,
@@ -23,73 +26,93 @@ class ActionRow extends HookWidget {
     required this.targetNumber,
     required this.updateCatchState,
     required this.isLinkTab,
+    required this.flutterLocalNotificationsPlugin,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final linkKind = kindsState.value[targetNumber];
 
-    return Row(
-      children: [
-        Text(
-          linkKind != '' ? linkKind : AppLocalizations.of(context).no_kind,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey.shade700,
+    return Container(
+      height: 29,
+      padding: const EdgeInsets.only(
+        top: 3,
+        left: 10,
+        right: 15,
+        bottom: 6,
+      ),
+      child: Row(
+        children: [
+          Text(
+            linkKind != '' ? linkKind : AppLocalizations.of(context).no_kind,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey.shade700,
+            ),
           ),
-        ),
-        SetKind(
-          selectableKinds: selectableKinds,
-          kindsState: kindsState,
-          targetNumber: targetNumber,
-          updateCatchState: updateCatchState,
-          isLinkTab: true,
-        ),
-        const Spacer(),
-        // 削除ボタン
-        GestureDetector(
-          onTap: () async {
-            EasyLoading.showToast(
-              AppLocalizations.of(context).delete_data,
-              duration: const Duration(milliseconds: 2500),
-              toastPosition: EasyLoadingToastPosition.center,
-              dismissOnTap: true,
-            );
-          },
-          onLongPress: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            // 対象を削除
-            contentsState.value.removeAt(targetNumber);
-            kindsState.value.removeAt(targetNumber);
-
-            prefs.setStringList(isLinkTab ? 'linkContents' : 'memoContents',
-                contentsState.value);
-            prefs.setStringList(
-                isLinkTab ? 'linkKinds' : 'memoKinds', kindsState.value);
-
-            EasyLoading.showToast(
-              AppLocalizations.of(context).delete_finished,
-              duration: const Duration(milliseconds: 3000),
-              toastPosition: EasyLoadingToastPosition.center,
-              dismissOnTap: true,
-            );
-
-            updateCatchState.value = UpdateCatch(
-              targetNumber: targetNumber,
-              isDelete: true,
-              kind: null,
-              url: null,
-              isRegeneration: false,
-            );
-          },
-          child: Icon(
-            Icons.delete,
-            color: Colors.red.shade400,
-            size: 22,
+          SetKind(
+            selectableKinds: selectableKinds,
+            kindsState: kindsState,
+            targetNumber: targetNumber,
+            updateCatchState: updateCatchState,
+            isLinkTab: isLinkTab,
           ),
-        ),
-        const SizedBox(width: 15),
-      ],
+          const Spacer(),
+          IconButton(
+            padding: const EdgeInsets.all(0),
+            iconSize: 22,
+            icon: Icon(
+              Icons.timer,
+              color: Colors.orange.shade500,
+            ),
+            onPressed: () async {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.NO_HEADER,
+                headerAnimationLoop: false,
+                showCloseIcon: true,
+                animType: AnimType.SCALE,
+                width:
+                    MediaQuery.of(context).size.width * .86 > 550 ? 550 : null,
+                body: TimerSetModal(
+                  isLinkTab: isLinkTab,
+                  content: contentsState.value[targetNumber],
+                  flutterLocalNotificationsPlugin:
+                      flutterLocalNotificationsPlugin,
+                ),
+              ).show();
+            },
+          ),
+          const SizedBox(width: 5),
+          // 削除ボタン
+          GestureDetector(
+            onTap: () async {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.NO_HEADER,
+                headerAnimationLoop: false,
+                showCloseIcon: true,
+                animType: AnimType.SCALE,
+                width:
+                    MediaQuery.of(context).size.width * .86 > 550 ? 550 : null,
+                body: DeleteModal(
+                  contentsState: contentsState,
+                  kindsState: kindsState,
+                  targetNumber: targetNumber,
+                  updateCatchState: updateCatchState,
+                  isLinkTab: isLinkTab,
+                  content: contentsState.value[targetNumber],
+                ),
+              ).show();
+            },
+            child: Icon(
+              Icons.delete,
+              color: Colors.red.shade400,
+              size: 22,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

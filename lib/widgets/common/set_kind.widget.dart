@@ -9,7 +9,6 @@ class SetKind extends HookWidget {
   final ValueNotifier<List<String>> kindsState;
   final int targetNumber;
   final ValueNotifier<UpdateCatch> updateCatchState;
-
   final bool isLinkTab;
 
   const SetKind({
@@ -36,33 +35,30 @@ class SetKind extends HookWidget {
       );
     }
 
-    return SizedBox(
-      height: 20,
-      child: PopupMenuButton<String>(
-        padding: const EdgeInsets.all(0),
-        icon: Icon(
-          Icons.edit,
-          color: enabledSet ? Colors.green.shade400 : Colors.grey,
-        ),
-        iconSize: 22,
-        enabled: enabledSet,
-        onSelected: (String result) async {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-
-          kindsState.value[targetNumber] = result;
-          prefs.setStringList(
-              isLinkTab ? 'linkKinds' : 'memoKinds', kindsState.value);
-
-          updateCatchState.value = UpdateCatch(
-            targetNumber: targetNumber,
-            isDelete: false,
-            kind: result,
-            url: null,
-            isRegeneration: false,
-          );
-        },
-        itemBuilder: (BuildContext context) => kindMenus,
+    return PopupMenuButton<String>(
+      padding: const EdgeInsets.all(0),
+      icon: Icon(
+        Icons.edit,
+        color: enabledSet ? Colors.green.shade400 : Colors.grey,
       ),
+      iconSize: 22,
+      enabled: enabledSet,
+      onSelected: (String result) async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        kindsState.value[targetNumber] = result;
+        prefs.setStringList(
+            isLinkTab ? 'linkKinds' : 'memoKinds', kindsState.value);
+
+        updateCatchState.value = UpdateCatch(
+          targetNumber: targetNumber,
+          isDelete: false,
+          kind: result,
+          url: null,
+          isRegeneration: false,
+        );
+      },
+      itemBuilder: (BuildContext context) => kindMenus,
     );
   }
 }

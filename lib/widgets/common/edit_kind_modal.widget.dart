@@ -260,7 +260,7 @@ class EditKindModal extends HookWidget {
                         AppLocalizations.of(context).cannot_enter_same_kind,
                         duration: const Duration(milliseconds: 2500),
                         toastPosition: EasyLoadingToastPosition.center,
-                        dismissOnTap: true,
+                        dismissOnTap: false,
                       );
                     }
                   }
@@ -362,7 +362,7 @@ class EditKindModal extends HookWidget {
                         AppLocalizations.of(context).cannot_enter_same_kind,
                         duration: const Duration(milliseconds: 2500),
                         toastPosition: EasyLoadingToastPosition.center,
-                        dismissOnTap: true,
+                        dismissOnTap: false,
                       );
                     }
 

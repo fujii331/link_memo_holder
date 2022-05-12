@@ -6,7 +6,7 @@
   "no_memo": "You can register the memo by pressing the + button or sharing from another app.",
   "no_kind": "No kind",
   "memo": "Memo",
-  "delete_data": "Press and hold the button to delete.",
+  "confirm_delete": "Do you delete it?",
   "delete_finished": "Deleted it.",
   "link_kinds": "Link kinds",
   "memo_kinds": "Memo kinds",
@@ -21,5 +21,16 @@
   "invalid_url_format": "URL format is invalid.",
   "invalid_url": "Url is invalid.",
   "no_title": "No title",
-  "no_description": "No description"
+  "link_timer_title": "Notify the scheduled URL Link",
+  "memo_timer_title": "Notify the scheduled Memo",
+  "link_timer_set": "Notify URL",
+  "memo_timer_set": "Notify Memo",
+  "date": "Date",
+  "time": "Time",
+  "notice_add": "Notify registered.　",
+  "before_now": "Please set the time after now.",
+  "delete": "Delete",
+  "added": "Add completed.",
+  "add_data": "Add",
+  "register": "Register"
 }

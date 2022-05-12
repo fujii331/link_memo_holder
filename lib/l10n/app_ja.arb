@@ -6,7 +6,7 @@
   "no_memo": "+ボタンか他のアプリからの共有でメモを登録できます。",
   "no_kind": "分類なし",
   "memo": "メモ",
-  "delete_data": "ボタン長押しで削除",
+  "confirm_delete": "削除しますか？",
   "delete_finished": "削除しました",
   "link_kinds": "リンク分類",
   "memo_kinds": "メモ分類",
@@ -20,6 +20,17 @@
   "kind": "分類",
   "invalid_url_format": "URLの形式が不正です",
   "invalid_url": "無効なURLです",
-  "no_title": "タイトルなし",
-  "no_description": "説明文なし"
+  "no_title": "タイトル不明",
+  "link_timer_title": "予約されたURLリンクを通知",
+  "memo_timer_title": "予約されたメモを通知",
+  "link_timer_set": "URLを通知",
+  "memo_timer_set": "メモを通知",
+  "date": "日付",
+  "time": "時間",
+  "notice_add": "通知予約を登録しました　",
+  "before_now": "現在時刻より後の時刻を設定して下さい",
+  "delete": "削除",
+  "added": "登録しました",
+  "add_data": "登録",
+  "register": "登録"
 }

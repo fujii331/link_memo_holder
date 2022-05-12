@@ -5,10 +5,12 @@ class LinkCardItem {
   final LinkCard linkCard;
   final Uri uri;
   final Metadata? metadata;
+  final String url;
 
   const LinkCardItem({
     required this.linkCard,
     required this.uri,
     required this.metadata,
+    required this.url,
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
+import 'package:link_memo_holder/parts/reg_exp.part.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void addSharedContent(
@@ -13,10 +14,7 @@ void addSharedContent(
   ValueNotifier<UpdateCatch> updateMemoCatchState,
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  // 正規表現
-  RegExp regExp = RegExp(
-      r'((https?:\/\/)|(https?:www\.)|(www\.))[a-zA-Z0-9-]{1,256}\.[a-zA-Z0-9]{2,6}(\/[a-zA-Z0-9亜-熙ぁ-んァ-ヶ()@:%_\+.~#?&\/=-]*)?');
-
+  // URL判定
   if (regExp.hasMatch(content)) {
     // urlが渡ってきた場合
     linkContentsState.value.add(content);
@@ -35,7 +33,7 @@ void addSharedContent(
       "Link +",
       duration: const Duration(milliseconds: 2500),
       toastPosition: EasyLoadingToastPosition.center,
-      dismissOnTap: true,
+      dismissOnTap: false,
     );
   } else {
     // url以外の場合
@@ -55,7 +53,7 @@ void addSharedContent(
       "Memo +",
       duration: const Duration(milliseconds: 2500),
       toastPosition: EasyLoadingToastPosition.center,
-      dismissOnTap: true,
+      dismissOnTap: false,
     );
   }
 }

@@ -60,7 +60,7 @@ class FilterKind extends HookWidget {
                 AppLocalizations.of(context).to_use_kinds,
                 duration: const Duration(milliseconds: 2500),
                 toastPosition: EasyLoadingToastPosition.center,
-                dismissOnTap: true,
+                dismissOnTap: false,
               );
             },
           );

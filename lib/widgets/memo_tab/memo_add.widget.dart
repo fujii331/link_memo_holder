@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/widgets/common/initial_kind_set.widget.dart';
@@ -98,14 +97,11 @@ class MemoAdd extends HookWidget {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  child: const Text('登録'),
+                  child: Text(AppLocalizations.of(context).add_data),
                   style: ElevatedButton.styleFrom(
                     primary: textController.text.isNotEmpty
                         ? Colors.orange.shade600
                         : Colors.orange.shade200,
-                    padding: EdgeInsets.only(
-                      bottom: Platform.isAndroid ? 3 : 1,
-                    ),
                     shape: const StadiumBorder(),
                     side: BorderSide(
                       width: 2,
@@ -135,6 +131,13 @@ class MemoAdd extends HookWidget {
                                   'memoContents', memoContentsState.value);
                               prefs.setStringList(
                                   'memoKinds', memoKindsState.value);
+
+                              EasyLoading.showToast(
+                                AppLocalizations.of(context).added,
+                                duration: const Duration(milliseconds: 2500),
+                                toastPosition: EasyLoadingToastPosition.center,
+                                dismissOnTap: false,
+                              );
 
                               Navigator.pop(context);
 

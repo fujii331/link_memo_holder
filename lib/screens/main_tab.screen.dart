@@ -2,6 +2,11 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
 import 'package:link_memo_holder/models/link_card_item.model.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
 import 'package:link_memo_holder/services/fetch_ogp.service.dart';
@@ -36,6 +41,25 @@ class MainTabScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    // 通知、タイムゾーンを初期化
+    Future(() async {
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('app_icon');
+      const InitializationSettings initializationSettings =
+          InitializationSettings(android: initializationSettingsAndroid);
+      await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+      );
+
+      final String currentTimeZone =
+          await FlutterNativeTimezone.getLocalTimezone();
+      tz.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation(currentTimeZone));
+    });
+
     final screenNo = useState<int>(0);
     final pageController = usePageController(initialPage: 0, keepPage: true);
     final selectLinkKindState = useState<String?>(null);
@@ -73,7 +97,8 @@ class MainTabScreen extends HookWidget {
         List<LinkCardItem> linkCardItems = [];
 
         for (var i = 0; i < linkContentsState.value.length; i++) {
-          final uri = Uri.parse(linkContentsState.value[i]);
+          final url = linkContentsState.value[i];
+          final uri = Uri.parse(url);
 
           Metadata? metadata = await fetchOgp(uri);
           linkCardItems.add(
@@ -88,10 +113,14 @@ class MainTabScreen extends HookWidget {
                   targetNumber: i,
                   updateCatchState: updateLinkCatchState,
                   isLinkTab: true,
+                  flutterLocalNotificationsPlugin:
+                      flutterLocalNotificationsPlugin,
                 ),
+                url: url,
               ),
               uri: uri,
               metadata: metadata,
+              url: url,
             ),
           );
         }
@@ -104,7 +133,7 @@ class MainTabScreen extends HookWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -169,6 +198,14 @@ class MainTabScreen extends HookWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(
+          side: BorderSide(
+            width: 1,
+            color: isLink
+                ? const Color.fromARGB(255, 9, 137, 142)
+                : const Color.fromARGB(255, 183, 50, 9),
+          ),
+        ),
         onPressed: () {
           showModalBottomSheet(
             context: context,
@@ -205,7 +242,7 @@ class MainTabScreen extends HookWidget {
         ),
         backgroundColor: isLink
             ? const Color.fromARGB(255, 9, 178, 184)
-            : Colors.orange.shade800,
+            : const Color.fromARGB(185, 225, 62, 13),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
@@ -262,6 +299,7 @@ class MainTabScreen extends HookWidget {
             loadingState: loadingState,
             updateLinkCatchState: updateLinkCatchState,
             selectLinkKind: selectLinkKindState.value,
+            flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
           ),
           MemoTab(
             selectableMemoKindsState: selectableMemoKindsState,
@@ -269,6 +307,7 @@ class MainTabScreen extends HookWidget {
             memoKindsState: memoKindsState,
             updateMemoCatchState: updateMemoCatchState,
             selectMemoKind: selectMemoKindState.value,
+            flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
           ),
         ],
       ),

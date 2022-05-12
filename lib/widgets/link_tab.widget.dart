@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:link_memo_holder/models/link_card_item.model.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
@@ -18,6 +20,7 @@ class LinkTab extends HookWidget {
   final ValueNotifier<bool> loadingState;
   final ValueNotifier<UpdateCatch> updateLinkCatchState;
   final String? selectLinkKind;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   const LinkTab({
     Key? key,
@@ -28,6 +31,7 @@ class LinkTab extends HookWidget {
     required this.loadingState,
     required this.updateLinkCatchState,
     required this.selectLinkKind,
+    required this.flutterLocalNotificationsPlugin,
   }) : super(key: key);
 
   @override
@@ -35,6 +39,16 @@ class LinkTab extends HookWidget {
     final double paddingWidth = MediaQuery.of(context).size.width > 550.0
         ? (MediaQuery.of(context).size.width - 550) / 2
         : 5;
+
+    final BannerAd myBanner = BannerAd(
+      // adUnitId: androidBannerAdvid,
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: const BannerAdListener(),
+    );
+
+    myBanner.load();
 
     useEffect(() {
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
@@ -60,21 +74,27 @@ class LinkTab extends HookWidget {
                       targetNumber: i,
                       updateCatchState: updateLinkCatchState,
                       isLinkTab: true,
+                      flutterLocalNotificationsPlugin:
+                          flutterLocalNotificationsPlugin,
                     ),
+                    url: linkCardItem.url,
                   ),
                   uri: linkCardItem.uri,
                   metadata: linkCardItem.metadata,
+                  url: linkCardItem.url,
                 ),
               );
             }
           } else {
+            int deletedCount = 0;
             for (var i = 0; i < linkCardItemsState.value.length; i++) {
               final linkCardItem = linkCardItemsState.value[i];
 
               // 変更対象の場合
               if (i == updateLinkCatchState.value.targetNumber) {
                 if (updateLinkCatchState.value.isDelete) {
-                  // 削除の場合何もしない
+                  // 削除の場合削除カウントを加算
+                  deletedCount++;
                 } else {
                   // 変更の場合は再作成
                   linkCardItems.add(
@@ -89,15 +109,43 @@ class LinkTab extends HookWidget {
                           targetNumber: i,
                           updateCatchState: updateLinkCatchState,
                           isLinkTab: true,
+                          flutterLocalNotificationsPlugin:
+                              flutterLocalNotificationsPlugin,
                         ),
+                        url: linkCardItem.url,
                       ),
                       uri: linkCardItem.uri,
                       metadata: linkCardItem.metadata,
+                      url: linkCardItem.url,
                     ),
                   );
                 }
+              } else if (deletedCount > 0) {
+                // 削除があった場合はtargetNumberを再構築
+                linkCardItems.add(
+                  LinkCardItem(
+                    linkCard: LinkCard(
+                      uri: linkCardItem.uri,
+                      metadata: linkCardItem.metadata,
+                      actionRow: ActionRow(
+                        selectableKinds: selectableLinkKinds,
+                        contentsState: linkContentsState,
+                        kindsState: linkKindsState,
+                        targetNumber: i - deletedCount,
+                        updateCatchState: updateLinkCatchState,
+                        isLinkTab: true,
+                        flutterLocalNotificationsPlugin:
+                            flutterLocalNotificationsPlugin,
+                      ),
+                      url: linkCardItem.url,
+                    ),
+                    uri: linkCardItem.uri,
+                    metadata: linkCardItem.metadata,
+                    url: linkCardItem.url,
+                  ),
+                );
               } else {
-                // 対象じゃないものはそのまま追加
+                // そのまま追加
                 linkCardItems.add(linkCardItem);
               }
             }
@@ -107,7 +155,8 @@ class LinkTab extends HookWidget {
               loadingState.value = true;
 
               // 登録の場合はurlに値が入っている
-              final uri = Uri.parse(updateLinkCatchState.value.url!);
+              final url = updateLinkCatchState.value.url!;
+              final uri = Uri.parse(url);
               Metadata? metadata = await fetchOgp(uri);
               linkCardItems.add(
                 LinkCardItem(
@@ -121,10 +170,14 @@ class LinkTab extends HookWidget {
                       targetNumber: linkContentsState.value.length - 1,
                       updateCatchState: updateLinkCatchState,
                       isLinkTab: true,
+                      flutterLocalNotificationsPlugin:
+                          flutterLocalNotificationsPlugin,
                     ),
+                    url: url,
                   ),
                   uri: uri,
                   metadata: metadata,
+                  url: url,
                 ),
               );
 
@@ -168,42 +221,62 @@ class LinkTab extends HookWidget {
                   size: 30,
                 ),
               )
-            : Padding(
-                padding: const EdgeInsets.only(
-                  right: 10,
-                  left: 10,
-                  top: 4,
-                  bottom: 10,
-                ),
-                child: linkCardItemsState.value.isNotEmpty &&
-                        (selectLinkKind == null ||
-                            linkKindsState.value
-                                .where((element) => element == selectLinkKind)
-                                .toList()
-                                .isNotEmpty)
-                    ? ListView.builder(
-                        itemBuilder: (context, index) {
-                          final displayIndex =
-                              linkCardItemsState.value.length - index - 1;
-                          // 分類が設定されていないか、対象の分類だった場合は表示対象に
-                          if (selectLinkKind == null ||
-                              linkKindsState.value[displayIndex] ==
-                                  selectLinkKind) {
-                            return linkCardItemsState
-                                .value[displayIndex].linkCard;
-                          } else {
-                            return Container();
-                          }
-                        },
-                        itemCount: linkCardItemsState.value.length,
-                      )
-                    : Text(
-                        AppLocalizations.of(context).no_link,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 16,
-                        ),
-                      ),
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 4,
+                      bottom: 7,
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: AdWidget(ad: myBanner),
+                      width: myBanner.size.width.toDouble(),
+                      height: myBanner.size.height.toDouble(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: 10,
+                      left: 10,
+                      top: 4,
+                      bottom: 10,
+                    ),
+                    child: linkCardItemsState.value.isNotEmpty &&
+                            (selectLinkKind == null ||
+                                linkKindsState.value
+                                    .where(
+                                        (element) => element == selectLinkKind)
+                                    .toList()
+                                    .isNotEmpty)
+                        ? SizedBox(
+                            height: MediaQuery.of(context).size.height - 230,
+                            child: ListView.builder(
+                              itemBuilder: (context, index) {
+                                final displayIndex =
+                                    linkCardItemsState.value.length - index - 1;
+                                // 分類が設定されていないか、対象の分類だった場合は表示対象に
+                                if (selectLinkKind == null ||
+                                    linkKindsState.value[displayIndex] ==
+                                        selectLinkKind) {
+                                  return linkCardItemsState
+                                      .value[displayIndex].linkCard;
+                                } else {
+                                  return Container();
+                                }
+                              },
+                              itemCount: linkCardItemsState.value.length,
+                            ),
+                          )
+                        : Text(
+                            AppLocalizations.of(context).no_link,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 16,
+                            ),
+                          ),
+                  ),
+                ],
               ),
       ),
     );
