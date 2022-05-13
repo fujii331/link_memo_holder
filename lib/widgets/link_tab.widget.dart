@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:link_memo_holder/data/advertising.dart';
 
 import 'package:link_memo_holder/models/link_card_item.model.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
@@ -41,8 +42,7 @@ class LinkTab extends HookWidget {
         : 5;
 
     final BannerAd myBanner = BannerAd(
-      // adUnitId: androidBannerAdvid,
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      adUnitId: androidBannerAdvid,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: const BannerAdListener(),

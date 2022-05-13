@@ -201,9 +201,7 @@ class MainTabScreen extends HookWidget {
         shape: CircleBorder(
           side: BorderSide(
             width: 1,
-            color: isLink
-                ? const Color.fromARGB(255, 9, 137, 142)
-                : const Color.fromARGB(255, 183, 50, 9),
+            color: isLink ? Colors.teal.shade600 : Colors.deepOrange.shade900,
           ),
         ),
         onPressed: () {
@@ -240,9 +238,8 @@ class MainTabScreen extends HookWidget {
           size: 30,
           color: Colors.white,
         ),
-        backgroundColor: isLink
-            ? const Color.fromARGB(255, 9, 178, 184)
-            : const Color.fromARGB(185, 225, 62, 13),
+        backgroundColor:
+            isLink ? Colors.teal.shade400 : Colors.deepOrange.shade800,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(

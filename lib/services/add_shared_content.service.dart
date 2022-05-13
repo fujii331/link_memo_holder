@@ -30,7 +30,7 @@ void addSharedContent(
     );
 
     EasyLoading.showToast(
-      "Link +",
+      "Link added!",
       duration: const Duration(milliseconds: 2500),
       toastPosition: EasyLoadingToastPosition.center,
       dismissOnTap: false,
@@ -50,7 +50,7 @@ void addSharedContent(
     );
 
     EasyLoading.showToast(
-      "Memo +",
+      "Memo added!",
       duration: const Duration(milliseconds: 2500),
       toastPosition: EasyLoadingToastPosition.center,
       dismissOnTap: false,
