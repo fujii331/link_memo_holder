@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:link_memo_holder/services/add_shared_content.service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -22,43 +23,37 @@ import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainTabScreen extends HookWidget {
-  final ValueNotifier<List<String>> memoContentsState;
-  final ValueNotifier<List<String>> linkContentsState;
-  final ValueNotifier<List<String>> memoKindsState;
-  final ValueNotifier<List<String>> linkKindsState;
-  final ValueNotifier<UpdateCatch> updateLinkCatchState;
-  final ValueNotifier<UpdateCatch> updateMemoCatchState;
+  final String? sharedText;
 
   const MainTabScreen({
     Key? key,
-    required this.memoContentsState,
-    required this.linkContentsState,
-    required this.memoKindsState,
-    required this.linkKindsState,
-    required this.updateLinkCatchState,
-    required this.updateMemoCatchState,
+    required this.sharedText,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    // 通知、タイムゾーンを初期化
-    Future(() async {
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('app_icon');
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
-      await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-      );
-
-      final String currentTimeZone =
-          await FlutterNativeTimezone.getLocalTimezone();
-      tz.initializeTimeZones();
-      tz.setLocalLocation(tz.getLocation(currentTimeZone));
-    });
+    final memoContentsState = useState<List<String>>([]);
+    final linkContentsState = useState<List<String>>([]);
+    final memoKindsState = useState<List<String>>([]);
+    final linkKindsState = useState<List<String>>([]);
+    final updateLinkCatchState = useState<UpdateCatch>(
+      const UpdateCatch(
+        targetNumber: null,
+        isDelete: false,
+        kind: null,
+        url: null,
+        isRegeneration: false,
+      ),
+    );
+    final updateMemoCatchState = useState<UpdateCatch>(
+      const UpdateCatch(
+        targetNumber: null,
+        isDelete: false,
+        kind: null,
+        url: null,
+        isRegeneration: false,
+      ),
+    );
 
     final screenNo = useState<int>(0);
     final pageController = usePageController(initialPage: 0, keepPage: true);
@@ -72,64 +67,99 @@ class MainTabScreen extends HookWidget {
     final loadingState = useState<bool>(true);
     final linkCardItemsState = useState<List<LinkCardItem>>([]);
 
+    final initialState = useState<bool>(true);
+
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
     useEffect(() {
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
-        // 初回起動時のみ通過
-        SharedPreferences prefs = await SharedPreferences.getInstance();
+        if (initialState.value) {
+          // 通知、タイムゾーンを初期化
+          const AndroidInitializationSettings initializationSettingsAndroid =
+              AndroidInitializationSettings('app_icon');
+          const InitializationSettings initializationSettings =
+              InitializationSettings(android: initializationSettingsAndroid);
+          await flutterLocalNotificationsPlugin.initialize(
+            initializationSettings,
+          );
 
-        selectableLinkKindsState.value =
-            prefs.getStringList('selectableLinkKinds') ?? [];
+          final String currentTimeZone =
+              await FlutterNativeTimezone.getLocalTimezone();
+          tz.initializeTimeZones();
+          tz.setLocalLocation(tz.getLocation(currentTimeZone));
 
-        selectableMemoKindsState.value =
-            prefs.getStringList('selectableMemoKinds') ?? [];
+          // データ初期化
+          SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        linkContentsState.value = prefs.getStringList('linkContents') ?? [];
-        // linkContentsState.value = [];
+          selectableLinkKindsState.value =
+              prefs.getStringList('selectableLinkKinds') ?? [];
 
-        memoContentsState.value = prefs.getStringList('memoContents') ?? [];
+          selectableMemoKindsState.value =
+              prefs.getStringList('selectableMemoKinds') ?? [];
 
-        linkKindsState.value = prefs.getStringList('linkKinds') ?? [];
-        // linkKindsState.value = [];
+          linkContentsState.value = prefs.getStringList('linkContents') ?? [];
+          // linkContentsState.value = [];
 
-        memoKindsState.value = prefs.getStringList('memoKinds') ?? [];
+          memoContentsState.value = prefs.getStringList('memoContents') ?? [];
 
-        loadingState.value = true;
-        List<LinkCardItem> linkCardItems = [];
+          linkKindsState.value = prefs.getStringList('linkKinds') ?? [];
+          // linkKindsState.value = [];
 
-        for (var i = 0; i < linkContentsState.value.length; i++) {
-          final url = linkContentsState.value[i];
-          final uri = Uri.parse(url);
+          memoKindsState.value = prefs.getStringList('memoKinds') ?? [];
 
-          Metadata? metadata = await fetchOgp(uri);
-          linkCardItems.add(
-            LinkCardItem(
-              linkCard: LinkCard(
+          loadingState.value = true;
+          List<LinkCardItem> linkCardItems = [];
+
+          for (var i = 0; i < linkContentsState.value.length; i++) {
+            final url = linkContentsState.value[i];
+            final uri = Uri.parse(url);
+
+            Metadata? metadata = await fetchOgp(uri);
+            linkCardItems.add(
+              LinkCardItem(
+                linkCard: LinkCard(
+                  uri: uri,
+                  metadata: metadata,
+                  actionRow: ActionRow(
+                    selectableKinds: selectableLinkKindsState.value,
+                    contentsState: linkContentsState,
+                    kindsState: linkKindsState,
+                    targetNumber: i,
+                    updateCatchState: updateLinkCatchState,
+                    isLinkTab: true,
+                    flutterLocalNotificationsPlugin:
+                        flutterLocalNotificationsPlugin,
+                  ),
+                  url: url,
+                ),
                 uri: uri,
                 metadata: metadata,
-                actionRow: ActionRow(
-                  selectableKinds: selectableLinkKindsState.value,
-                  contentsState: linkContentsState,
-                  kindsState: linkKindsState,
-                  targetNumber: i,
-                  updateCatchState: updateLinkCatchState,
-                  isLinkTab: true,
-                  flutterLocalNotificationsPlugin:
-                      flutterLocalNotificationsPlugin,
-                ),
                 url: url,
               ),
-              uri: uri,
-              metadata: metadata,
-              url: url,
-            ),
-          );
+            );
+          }
+
+          linkCardItemsState.value = linkCardItems;
+          loadingState.value = false;
+
+          initialState.value = false;
         }
 
-        linkCardItemsState.value = linkCardItems;
-        loadingState.value = false;
+        if (sharedText != null) {
+          addSharedContent(
+            sharedText!,
+            memoContentsState,
+            linkContentsState,
+            memoKindsState,
+            linkKindsState,
+            updateLinkCatchState,
+            updateMemoCatchState,
+          );
+        }
       });
       return null;
-    }, const []);
+    }, [sharedText]);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
