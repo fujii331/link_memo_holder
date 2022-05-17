@@ -40,7 +40,10 @@ class LinkCardSample extends HookWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isFirst ? 'プログラミングの勉強（初心者向け）' : 'おすすめモーニングルーティン',
+                    // isFirst ? 'プログラミングの勉強（初心者向け）' : 'おすすめモーニングルーティン',
+                    isFirst
+                        ? 'Studying programming (for beginners)'
+                        : 'Recommended morning routine',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: const TextStyle(
@@ -63,9 +66,12 @@ class LinkCardSample extends HookWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
+                    // isFirst
+                    //     ? 'プログラミングの勉強をしたい人におすすめのサイトです。人気の言語やフレームワークなどを紹介しています。'
+                    //     : '朝早く起きてからやるべきこと10選。1日を快適に過ごすためにはこんなことをした方がいい！QOLを高める行動にはあるものが共通していた。',
                     isFirst
-                        ? 'プログラミングの勉強をしたい人におすすめのサイトです。人気の言語やフレームワークなどを紹介しています。'
-                        : '朝早く起きてからやるべきこと10選。1日を快適に過ごすためにはこんなことをした方がいい！QOLを高める行動とは。',
+                        ? 'This site is recommended for people who want to study programming. Introducing popular languages ​​and frameworks.'
+                        : '10 things to do after getting up early in the morning. You should do this to spend your day comfortably! Some behaviors to improve quality of life were common.',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: const TextStyle(

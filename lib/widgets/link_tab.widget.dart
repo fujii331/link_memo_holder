@@ -266,6 +266,20 @@ class LinkTab extends HookWidget {
                                 }
                               },
                               itemCount: linkCardItemsState.value.length,
+                              // height: MediaQuery.of(context).size.height - 165,
+                              // child: ListView.builder(
+                              //   itemBuilder: (context, index) {
+                              //     final displayIndex =
+                              //         linkCardItemsState.value.length - index - 1;
+
+                              //     return LinkCardSample(
+                              //         sampleNumber: index + 1,
+                              //         actionRow: linkCardItemsState
+                              //             .value[displayIndex]
+                              //             .linkCard
+                              //             .actionRow);
+                              //   },
+                              //   itemCount: 2,
                             ),
                           )
                         : Text(

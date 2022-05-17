@@ -102,6 +102,7 @@ class MemoTab extends HookWidget {
                               .isNotEmpty)
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height - 230,
+                      // height: MediaQuery.of(context).size.height - 165,
                       child: ListView.builder(
                         itemBuilder: (context, index) {
                           final displayIndex =
