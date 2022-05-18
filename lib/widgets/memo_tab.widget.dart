@@ -198,6 +198,7 @@ class MemoTab extends HookWidget {
               updateCatchState: updateMemoCatchState,
               isLinkTab: false,
               flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+              linkTitleEditable: false,
             ),
           ],
         ),

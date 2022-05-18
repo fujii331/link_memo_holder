@@ -11,6 +11,7 @@
   "link_kinds": "リンク分類",
   "memo_kinds": "メモ分類",
   "add": "追加",
+  "update": "更新",
   "edit_delete": "編集・削除",
   "can_delete": "削除できます",
   "cannot_add": "上限登録数です",
@@ -32,5 +33,6 @@
   "delete": "削除",
   "added": "登録しました",
   "add_data": "登録",
+  "link_title_edit": "タイトルを編集",
   "register": "登録"
 }

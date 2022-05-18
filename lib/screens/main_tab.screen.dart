@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:link_memo_holder/data/split_word.dart';
 import 'package:link_memo_holder/services/add_shared_content.service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -41,7 +42,7 @@ class MainTabScreen extends HookWidget {
         targetNumber: null,
         isDelete: false,
         kind: null,
-        url: null,
+        linkData: null,
         isRegeneration: false,
       ),
     );
@@ -50,7 +51,7 @@ class MainTabScreen extends HookWidget {
         targetNumber: null,
         isDelete: false,
         kind: null,
-        url: null,
+        linkData: null,
         isRegeneration: false,
       ),
     );
@@ -112,10 +113,14 @@ class MainTabScreen extends HookWidget {
           List<LinkCardItem> linkCardItems = [];
 
           for (var i = 0; i < linkContentsState.value.length; i++) {
-            final url = linkContentsState.value[i];
-            final uri = Uri.parse(url);
+            final linkData = linkContentsState.value[i];
+            final splitData = linkData.split(splitWord);
+            final targetUrl = splitData[0];
+            final uri = Uri.parse(targetUrl);
+            final Metadata? metadata = await fetchOgp(uri);
 
-            Metadata? metadata = await fetchOgp(uri);
+            final titleExist = metadata != null && metadata.title == null;
+
             linkCardItems.add(
               LinkCardItem(
                 linkCard: LinkCard(
@@ -130,12 +135,13 @@ class MainTabScreen extends HookWidget {
                     isLinkTab: true,
                     flutterLocalNotificationsPlugin:
                         flutterLocalNotificationsPlugin,
+                    linkTitleEditable: titleExist,
                   ),
-                  url: url,
+                  linkData: linkData,
                 ),
                 uri: uri,
                 metadata: metadata,
-                url: url,
+                linkData: linkData,
               ),
             );
           }

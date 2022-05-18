@@ -116,7 +116,7 @@ class DeleteModal extends HookWidget {
                       targetNumber: targetNumber,
                       isDelete: true,
                       kind: null,
-                      url: null,
+                      linkData: null,
                       isRegeneration: false,
                     );
 

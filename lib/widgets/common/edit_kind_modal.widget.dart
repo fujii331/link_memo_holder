@@ -142,7 +142,7 @@ class EditKindModal extends HookWidget {
             },
             inputFormatters: <TextInputFormatter>[
               LengthLimitingTextInputFormatter(
-                10,
+                14,
               ),
             ],
           ),
@@ -268,7 +268,7 @@ class EditKindModal extends HookWidget {
                     targetNumber: null,
                     isDelete: !updateCatchState.value.isDelete,
                     kind: null,
-                    url: null,
+                    linkData: null,
                     isRegeneration: true,
                   );
                   validateOkState.value = false;
@@ -313,7 +313,7 @@ class EditKindModal extends HookWidget {
               },
               inputFormatters: <TextInputFormatter>[
                 LengthLimitingTextInputFormatter(
-                  10,
+                  14,
                 ),
               ],
             ),
@@ -370,7 +370,7 @@ class EditKindModal extends HookWidget {
                       targetNumber: null,
                       isDelete: !updateCatchState.value.isDelete,
                       kind: null,
-                      url: null,
+                      linkData: null,
                       isRegeneration: true,
                     );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
@@ -81,6 +82,11 @@ class MemoAdd extends HookWidget {
                       ),
                     ),
                   ),
+                  inputFormatters: <TextInputFormatter>[
+                    LengthLimitingTextInputFormatter(
+                      1000,
+                    ),
+                  ],
                   style: const TextStyle(
                     fontSize: 15,
                   ),
@@ -123,7 +129,7 @@ class MemoAdd extends HookWidget {
                                 targetNumber: null,
                                 isDelete: !updateMemoCatchState.value.isDelete,
                                 kind: null,
-                                url: null,
+                                linkData: null,
                                 isRegeneration: false,
                               );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -60,6 +61,11 @@ class LinkAdd extends HookWidget {
                   ),
                 ),
                 controller: textController,
+                inputFormatters: <TextInputFormatter>[
+                  LengthLimitingTextInputFormatter(
+                    1000,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 25),
@@ -111,7 +117,7 @@ class LinkAdd extends HookWidget {
                               targetNumber: null,
                               isDelete: false,
                               kind: selectKindState.value,
-                              url: textController.text,
+                              linkData: textController.text,
                               isRegeneration: false,
                             );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:link_memo_holder/data/split_word.dart';
 import 'package:link_memo_holder/parts/reg_exp.part.dart';
 import 'package:link_memo_holder/widgets/common/action_row.widget.dart';
 import 'package:metadata_fetch/metadata_fetch.dart';
@@ -11,19 +12,27 @@ class LinkCard extends HookWidget {
   final Uri uri;
   final Metadata? metadata;
   final ActionRow actionRow;
-  final String url;
+  final String linkData;
 
   const LinkCard({
     Key? key,
     required this.uri,
     required this.metadata,
     required this.actionRow,
-    required this.url,
+    required this.linkData,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final bool dataExist = metadata != null;
+    final dataExist = metadata != null;
+    final splitData = linkData.split(splitWord);
+    final targetUrl = splitData[0];
+    final title = dataExist
+        ? metadata!.title ??
+            (splitData.length > 1
+                ? splitData[1]
+                : AppLocalizations.of(context).no_title)
+        : AppLocalizations.of(context).invalid_url;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -63,10 +72,7 @@ class LinkCard extends HookWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      dataExist
-                          ? metadata!.title ??
-                              AppLocalizations.of(context).no_title
-                          : AppLocalizations.of(context).invalid_url,
+                      title,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: const TextStyle(
@@ -89,7 +95,7 @@ class LinkCard extends HookWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      dataExist ? metadata!.description ?? url : '',
+                      dataExist ? metadata!.description ?? targetUrl : '',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: const TextStyle(

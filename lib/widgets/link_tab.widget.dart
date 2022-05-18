@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:link_memo_holder/data/advertising.dart';
+import 'package:link_memo_holder/data/split_word.dart';
 
 import 'package:link_memo_holder/models/link_card_item.model.dart';
 import 'package:link_memo_holder/models/update_catch.model.dart';
@@ -52,7 +53,7 @@ class LinkTab extends HookWidget {
 
     useEffect(() {
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
-        if (updateLinkCatchState.value.url != null ||
+        if (updateLinkCatchState.value.linkData != null ||
             updateLinkCatchState.value.targetNumber != null ||
             updateLinkCatchState.value.isRegeneration) {
           List<LinkCardItem> linkCardItems = [];
@@ -61,6 +62,9 @@ class LinkTab extends HookWidget {
             // actionRowを再生成
             for (var i = 0; i < linkCardItemsState.value.length; i++) {
               final linkCardItem = linkCardItemsState.value[i];
+
+              final titleExist = linkCardItem.metadata != null &&
+                  linkCardItem.metadata!.title == null;
 
               linkCardItems.add(
                 LinkCardItem(
@@ -76,12 +80,13 @@ class LinkTab extends HookWidget {
                       isLinkTab: true,
                       flutterLocalNotificationsPlugin:
                           flutterLocalNotificationsPlugin,
+                      linkTitleEditable: titleExist,
                     ),
-                    url: linkCardItem.url,
+                    linkData: linkCardItem.linkData,
                   ),
                   uri: linkCardItem.uri,
                   metadata: linkCardItem.metadata,
-                  url: linkCardItem.url,
+                  linkData: linkCardItem.linkData,
                 ),
               );
             }
@@ -89,6 +94,8 @@ class LinkTab extends HookWidget {
             int deletedCount = 0;
             for (var i = 0; i < linkCardItemsState.value.length; i++) {
               final linkCardItem = linkCardItemsState.value[i];
+              final titleExist = linkCardItem.metadata != null &&
+                  linkCardItem.metadata!.title == null;
 
               // 変更対象の場合
               if (i == updateLinkCatchState.value.targetNumber) {
@@ -111,12 +118,15 @@ class LinkTab extends HookWidget {
                           isLinkTab: true,
                           flutterLocalNotificationsPlugin:
                               flutterLocalNotificationsPlugin,
+                          linkTitleEditable: titleExist,
                         ),
-                        url: linkCardItem.url,
+                        linkData: updateLinkCatchState.value.linkData ??
+                            linkCardItem.linkData,
                       ),
                       uri: linkCardItem.uri,
                       metadata: linkCardItem.metadata,
-                      url: linkCardItem.url,
+                      linkData: updateLinkCatchState.value.linkData ??
+                          linkCardItem.linkData,
                     ),
                   );
                 }
@@ -136,12 +146,13 @@ class LinkTab extends HookWidget {
                         isLinkTab: true,
                         flutterLocalNotificationsPlugin:
                             flutterLocalNotificationsPlugin,
+                        linkTitleEditable: titleExist,
                       ),
-                      url: linkCardItem.url,
+                      linkData: linkCardItem.linkData,
                     ),
                     uri: linkCardItem.uri,
                     metadata: linkCardItem.metadata,
-                    url: linkCardItem.url,
+                    linkData: linkCardItem.linkData,
                   ),
                 );
               } else {
@@ -150,14 +161,19 @@ class LinkTab extends HookWidget {
               }
             }
 
-            if (updateLinkCatchState.value.url != null) {
+            if (updateLinkCatchState.value.targetNumber == null &&
+                updateLinkCatchState.value.linkData != null) {
               // 読み込み中に切り替え
               loadingState.value = true;
 
-              // 登録の場合はurlに値が入っている
-              final url = updateLinkCatchState.value.url!;
-              final uri = Uri.parse(url);
-              Metadata? metadata = await fetchOgp(uri);
+              // 登録の場合はlinkDataに値が入っている
+              final linkData = updateLinkCatchState.value.linkData!;
+              final splitData = linkData.split(splitWord);
+              final targetUrl = splitData[0];
+              final uri = Uri.parse(targetUrl);
+              final Metadata? metadata = await fetchOgp(uri);
+
+              final titleExist = metadata != null && metadata.title == null;
               linkCardItems.add(
                 LinkCardItem(
                   linkCard: LinkCard(
@@ -172,12 +188,13 @@ class LinkTab extends HookWidget {
                       isLinkTab: true,
                       flutterLocalNotificationsPlugin:
                           flutterLocalNotificationsPlugin,
+                      linkTitleEditable: titleExist,
                     ),
-                    url: url,
+                    linkData: linkData,
                   ),
                   uri: uri,
                   metadata: metadata,
-                  url: url,
+                  linkData: linkData,
                 ),
               );
 
@@ -192,7 +209,7 @@ class LinkTab extends HookWidget {
             targetNumber: null,
             isDelete: false,
             kind: null,
-            url: null,
+            linkData: null,
             isRegeneration: false,
           );
         }

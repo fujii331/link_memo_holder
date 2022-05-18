@@ -90,7 +90,7 @@ class MemoDetailScreen extends HookWidget {
                           targetNumber: null,
                           isDelete: !updateMemoCatchState.value.isDelete,
                           kind: null,
-                          url: null,
+                          linkData: null,
                           isRegeneration: false,
                         );
                       }
@@ -113,7 +113,7 @@ class MemoDetailScreen extends HookWidget {
                 controller: textController,
                 inputFormatters: <TextInputFormatter>[
                   LengthLimitingTextInputFormatter(
-                    300,
+                    1000,
                   ),
                 ],
               ),

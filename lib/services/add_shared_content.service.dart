@@ -15,7 +15,9 @@ void addSharedContent(
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // URL判定
-  if (regExp.hasMatch(content)) {
+  if (regExp.hasMatch(content) &&
+      (linkContentsState.value.isEmpty ||
+          content != linkContentsState.value.last)) {
     // urlが渡ってきた場合
     linkContentsState.value.add(content);
     linkKindsState.value.add('');
@@ -25,7 +27,7 @@ void addSharedContent(
       targetNumber: null,
       isDelete: false,
       kind: '',
-      url: content,
+      linkData: content,
       isRegeneration: false,
     );
 
@@ -35,7 +37,9 @@ void addSharedContent(
       toastPosition: EasyLoadingToastPosition.center,
       dismissOnTap: false,
     );
-  } else {
+  } else if (!regExp.hasMatch(content) &&
+      (memoContentsState.value.isEmpty ||
+          content != memoContentsState.value.last)) {
     // url以外の場合
     memoContentsState.value.add(content);
     memoKindsState.value.add('');
@@ -45,7 +49,7 @@ void addSharedContent(
       targetNumber: null,
       isDelete: !updateMemoCatchState.value.isDelete,
       kind: null,
-      url: null,
+      linkData: null,
       isRegeneration: false,
     );
 

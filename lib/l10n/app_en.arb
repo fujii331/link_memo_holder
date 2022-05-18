@@ -11,6 +11,7 @@
   "link_kinds": "Link kinds",
   "memo_kinds": "Memo kinds",
   "add": "Add",
+  "update": "Update",
   "edit_delete": "Edit・Delete",
   "can_delete": "You can delete.",
   "cannot_add": "Can't add any more.",
@@ -32,5 +33,6 @@
   "delete": "Delete",
   "added": "Add completed.",
   "add_data": "Add",
+  "link_title_edit": "Title Edit",
   "register": "Register"
 }
