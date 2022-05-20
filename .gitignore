@@ -50,7 +50,6 @@ app.*.map.json
 /android/app/src/main/res
 /ios/Runner/Assets.xcassets
 /web
-/lib/data
-ios/Runner/GoogleService-Info.plist
-android/app/src/main/ic_launcher-playstore.png
-/data
+/lib/data/advertising.example
+/ios/Runner/GoogleService-Info.plist
+/android/app/src/main/ic_launcher-playstore.png
