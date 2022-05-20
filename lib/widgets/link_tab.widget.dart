@@ -267,7 +267,7 @@ class LinkTab extends HookWidget {
                                     .toList()
                                     .isNotEmpty)
                         ? SizedBox(
-                            height: MediaQuery.of(context).size.height - 230,
+                            height: MediaQuery.of(context).size.height - 250,
                             child: ListView.builder(
                               itemBuilder: (context, index) {
                                 final displayIndex =

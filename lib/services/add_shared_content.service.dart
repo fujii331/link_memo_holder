@@ -15,31 +15,32 @@ void addSharedContent(
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // URL判定
-  if (regExp.hasMatch(content) &&
-      (linkContentsState.value.isEmpty ||
-          content != linkContentsState.value.last)) {
+  if ((content.startsWith('http') || content.startsWith('www')) &&
+      regExp.hasMatch(content)) {
     // urlが渡ってきた場合
-    linkContentsState.value.add(content);
-    linkKindsState.value.add('');
-    prefs.setStringList('linkContents', linkContentsState.value);
-    prefs.setStringList('linkKinds', linkKindsState.value);
-    updateLinkCatchState.value = UpdateCatch(
-      targetNumber: null,
-      isDelete: false,
-      kind: '',
-      linkData: content,
-      isRegeneration: false,
-    );
+    if (linkContentsState.value.isEmpty ||
+        content != linkContentsState.value.last) {
+      linkContentsState.value.add(content);
+      linkKindsState.value.add('');
+      prefs.setStringList('linkContents', linkContentsState.value);
+      prefs.setStringList('linkKinds', linkKindsState.value);
+      updateLinkCatchState.value = UpdateCatch(
+        targetNumber: null,
+        isDelete: false,
+        kind: '',
+        linkData: content,
+        isRegeneration: false,
+      );
 
-    EasyLoading.showToast(
-      "Link added!",
-      duration: const Duration(milliseconds: 2500),
-      toastPosition: EasyLoadingToastPosition.center,
-      dismissOnTap: false,
-    );
-  } else if (!regExp.hasMatch(content) &&
-      (memoContentsState.value.isEmpty ||
-          content != memoContentsState.value.last)) {
+      EasyLoading.showToast(
+        "Link added!",
+        duration: const Duration(milliseconds: 2500),
+        toastPosition: EasyLoadingToastPosition.center,
+        dismissOnTap: false,
+      );
+    }
+  } else if (memoContentsState.value.isEmpty ||
+      content != memoContentsState.value.last) {
     // url以外の場合
     memoContentsState.value.add(content);
     memoKindsState.value.add('');

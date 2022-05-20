@@ -6,7 +6,7 @@
   "no_memo": "You can register the memo by pressing the + button or sharing from another app.",
   "no_kind": "No kind",
   "memo": "Memo",
-  "confirm_delete": "Do you delete it?",
+  "confirm_delete": "Delete it?",
   "delete_finished": "Deleted it.",
   "link_kinds": "Link kinds",
   "memo_kinds": "Memo kinds",
@@ -34,5 +34,7 @@
   "added": "Add completed.",
   "add_data": "Add",
   "link_title_edit": "Title Edit",
+  "url_copied": "URL copied.",
+  "memo_copied": "Memo copied.",
   "register": "Register"
 }

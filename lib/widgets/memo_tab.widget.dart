@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -101,7 +103,7 @@ class MemoTab extends HookWidget {
                               .toList()
                               .isNotEmpty)
                   ? SizedBox(
-                      height: MediaQuery.of(context).size.height - 230,
+                      height: MediaQuery.of(context).size.height - 250,
                       // height: MediaQuery.of(context).size.height - 165,
                       child: ListView.builder(
                         itemBuilder: (context, index) {
@@ -165,6 +167,18 @@ class MemoTab extends HookWidget {
                       updateMemoCatchState: updateMemoCatchState,
                     ),
                   ),
+                );
+              },
+              onLongPress: () async {
+                final data =
+                    ClipboardData(text: memoContentsState.value[targetNumber]);
+                await Clipboard.setData(data);
+
+                EasyLoading.showToast(
+                  AppLocalizations.of(context).memo_copied,
+                  duration: const Duration(milliseconds: 2500),
+                  toastPosition: EasyLoadingToastPosition.center,
+                  dismissOnTap: false,
                 );
               },
               child: Container(

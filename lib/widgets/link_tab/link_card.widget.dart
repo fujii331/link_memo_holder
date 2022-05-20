@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:link_memo_holder/data/split_word.dart';
@@ -60,6 +61,17 @@ class LinkCard extends HookWidget {
                     dismissOnTap: false,
                   );
                 }
+              },
+              onLongPress: () async {
+                final data = ClipboardData(text: targetUrl);
+                await Clipboard.setData(data);
+
+                EasyLoading.showToast(
+                  AppLocalizations.of(context).url_copied,
+                  duration: const Duration(milliseconds: 2500),
+                  toastPosition: EasyLoadingToastPosition.center,
+                  dismissOnTap: false,
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.only(

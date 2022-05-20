@@ -34,5 +34,7 @@
   "added": "登録しました",
   "add_data": "登録",
   "link_title_edit": "タイトルを編集",
+  "url_copied": "URLをコピーしました",
+  "memo_copied": "メモをコピーしました",
   "register": "登録"
 }

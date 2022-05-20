@@ -109,11 +109,11 @@ class MainTabScreen extends HookWidget {
 
           memoKindsState.value = prefs.getStringList('memoKinds') ?? [];
 
-          loadingState.value = true;
           List<LinkCardItem> linkCardItems = [];
 
           for (var i = 0; i < linkContentsState.value.length; i++) {
-            final linkData = linkContentsState.value[i];
+            final targetNumber = linkContentsState.value.length - i - 1;
+            final linkData = linkContentsState.value[targetNumber];
             final splitData = linkData.split(splitWord);
             final targetUrl = splitData[0];
             final uri = Uri.parse(targetUrl);
@@ -121,7 +121,8 @@ class MainTabScreen extends HookWidget {
 
             final titleExist = metadata != null && metadata.title == null;
 
-            linkCardItems.add(
+            linkCardItems.insert(
+              0,
               LinkCardItem(
                 linkCard: LinkCard(
                   uri: uri,
@@ -130,7 +131,7 @@ class MainTabScreen extends HookWidget {
                     selectableKinds: selectableLinkKindsState.value,
                     contentsState: linkContentsState,
                     kindsState: linkKindsState,
-                    targetNumber: i,
+                    targetNumber: targetNumber,
                     updateCatchState: updateLinkCatchState,
                     isLinkTab: true,
                     flutterLocalNotificationsPlugin:
@@ -144,10 +145,25 @@ class MainTabScreen extends HookWidget {
                 linkData: linkData,
               ),
             );
+
+            // データを読み込んだら次々表示
+            linkCardItemsState.value = linkCardItems;
+            if (i == 0) {
+              loadingState.value = false;
+            } else {
+              updateLinkCatchState.value = const UpdateCatch(
+                targetNumber: -1,
+                isDelete: false,
+                kind: null,
+                linkData: null,
+                isRegeneration: false,
+              );
+            }
           }
 
-          linkCardItemsState.value = linkCardItems;
-          loadingState.value = false;
+          if (linkContentsState.value.isEmpty) {
+            loadingState.value = false;
+          }
 
           initialState.value = false;
         }

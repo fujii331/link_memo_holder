@@ -93,7 +93,9 @@ class LinkAdd extends HookWidget {
                       ? () async {
                           canUpdateState.value = false;
                           // URL判定
-                          if (!regExp.hasMatch(textController.text)) {
+                          if ((!textController.text.startsWith('http') &&
+                                  !textController.text.startsWith('www')) ||
+                              !regExp.hasMatch(textController.text)) {
                             EasyLoading.showToast(
                               AppLocalizations.of(context).invalid_url_format,
                               duration: const Duration(milliseconds: 2500),
